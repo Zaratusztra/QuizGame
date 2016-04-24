@@ -1,0 +1,17 @@
+{
+    {
+        "Question":"Who is the creator of the Language Python?",
+        "Answers":["(a) Donald Ervin Knuth","(b) Guido van Rossum", "(c) Linus Torvalds"],
+        "Correct_answer":"b" 
+    },
+    {
+        "Question":"Who is Donald Ervin Knuth?",
+        "Answers":["(a) Programmer and Mathematician","(b) Psysicist"],
+        "Correct_answer":"a"
+    },
+    {
+        "Question":"Is python an Object Oriented Language",
+        "Answers":["(a) Yes","(b) No"],
+        "Correct_answer":"a"
+    }
+}
