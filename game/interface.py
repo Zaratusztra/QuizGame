@@ -18,7 +18,9 @@ class Ui:
 
     def output(self, *args, block = True):
         self._clear_screen()
-        print(*args)
+        print('\n')
+        for i in args:
+            print('    ', i)
         if block: 
             input("\n\nPress any key...")
             self._clear_screen()
@@ -37,9 +39,10 @@ class Ui:
         self._clear_screen()
 
     def warning(self, *args):
-        self._clear_screen
+        self._clear_screen()
         print("WARNING: ", *args)
-        self._clear_screen
+        input('...press any key...')
+        self._clear_screen()
 
     def quit(self):
         self._clear_screen()
