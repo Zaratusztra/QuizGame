@@ -8,6 +8,13 @@ class Ui:
     def __init__(self):
         pass
 
+    def _hline(ch, l):
+        s = '\n'
+        for i in range(l):
+            s += ch
+        s += '\n'
+        return s
+
     def _clear_screen(self):
         if os.name == 'posix':
             os.system('clear')
@@ -35,13 +42,16 @@ class Ui:
     def input(self, arg='', clear_before=False):
         if clear_before:
             self._clear_screen()
+            arg = '\n\n     '+str(arg)
         return input(arg)
         self._clear_screen()
 
-    def warning(self, *args):
+    def warning(self, warn):
         self._clear_screen()
-        print("WARNING: ", *args)
-        input('...press any key...')
+        print(Ui._hline('=', len(warn)+27))
+        print("\n       WARNING: {}\n\n".format(warn))
+        print(Ui._hline('=', len(warn)+27))
+        input('\n<press any key>')
         self._clear_screen()
 
     def quit(self):

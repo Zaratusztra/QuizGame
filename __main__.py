@@ -24,7 +24,7 @@ class Application:
     def setup_actions(self):
         self.possible_options = [
                                 '[S]tart new game',
-                                #'[V]iew last score',
+                                #'[V]iew last score', maybe in the future
                                 'View [T]otal score'
                                 '[L]ogin',
                                 'Load quiz from [F]ile',
@@ -72,7 +72,7 @@ class Application:
             self.save_user_score()
 
     def login_user(self):
-        new_user_login = self.ui.input("login:")
+        new_user_login = self.ui.input("login:", clear_before=True)
         #loading new user by login and asking for password
 
     #def view_last_user_score(self): # TO-DO
@@ -82,9 +82,7 @@ class Application:
         pass
 
     def load_quiz_from_file(self):
-        fname = self.ui.input('file-name:')
-        print("HERE")
-        self.ui.input('file-name:')
+        fname = self.ui.input('file-name:', clear_before=True)
         try:
             q = data_loader.load_quiz_from_json(fname)
             self.quiz = q
@@ -104,12 +102,6 @@ class Application:
 
 
 if __name__ == '__main__':
-    #from game.quiz import Riddle
-    #r = list()
-    #r.append(Riddle('correct answer is a', ['(a) Answer', '(b) Answer'], 'a'))
-    #r.append(Riddle('correct answer is b', ['(a) Answer', '(b) Answer'], 'b'))
-    #r.append(Riddle('correct answer is c', ['(a) Answer', '(b) Answer', '(c) Answer'], 'c'))
-    #q = Quiz(r)
     app = Application()
     app.main_loop()
 
