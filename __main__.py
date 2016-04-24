@@ -7,7 +7,10 @@ import argparse
 from game.users import User
 from game.quiz import Quiz
 from game.interface import Ui
+
 from common.stringtools import *
+
+from game import data_loader
 
 class Application:
 
@@ -36,6 +39,8 @@ class Application:
         elif command == 't':
             self.view_user_total_score()
         elif command == 'l':
+            self.login_user()
+        elif command == 'f':
             self.load_quiz_from_file()
         elif command == 'q':
             self.ui.quit()
@@ -77,8 +82,18 @@ class Application:
         pass
 
     def load_quiz_from_file(self):
-        #START!
-        return
+        fname = self.ui.input('file-name:')
+        print("HERE")
+        self.ui.input('file-name:')
+        try:
+            q = data_loader.load_quiz_from_json(fname)
+            self.quiz = q
+        except (FileNotFoundError, OSError) as ex:
+            self.ui.warning("Error - file not found.")
+        except Exception as ex:
+            self.ui.warning("Error while processing file... {}".format(ex))
+        else:
+            self.ui.output("Quiz successfully loaded.")
 
     def show_main_menu(self):
         for option in self.possible_actions:
@@ -89,13 +104,13 @@ class Application:
 
 
 if __name__ == '__main__':
-    from game.quiz import Riddle
-    r = list()
-    r.append(Riddle('correct answer is a', ['(a) Answer', '(b) Answer'], 'a'))
-    r.append(Riddle('correct answer is b', ['(a) Answer', '(b) Answer'], 'b'))
-    r.append(Riddle('correct answer is c', ['(a) Answer', '(b) Answer', '(c) Answer'], 'c'))
-    q = Quiz(r)
-    app = Application(q)
+    #from game.quiz import Riddle
+    #r = list()
+    #r.append(Riddle('correct answer is a', ['(a) Answer', '(b) Answer'], 'a'))
+    #r.append(Riddle('correct answer is b', ['(a) Answer', '(b) Answer'], 'b'))
+    #r.append(Riddle('correct answer is c', ['(a) Answer', '(b) Answer', '(c) Answer'], 'c'))
+    #q = Quiz(r)
+    app = Application()
     app.main_loop()
 
 
