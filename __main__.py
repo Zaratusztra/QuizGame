@@ -77,7 +77,8 @@ class Application:
         pass
 
     def load_quiz_from_file(self):
-        pass
+        #START!
+        return
 
     def show_main_menu(self):
         for option in self.possible_actions:
