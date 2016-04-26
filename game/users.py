@@ -3,14 +3,14 @@
 # By Ziemowit "Zaratustra" Wójcicki
 
 class User:
+    """
+    Class represents user in system.
+    """
 
     def __init__(self, login = 'guest', score = 0, last_score = 0):
-        try:
-            self._login = str(login)
-            self._score = int(score)
-            self._last_score = int(last_score)
-        except:
-            raise ValueError
+        self._login = str(login)
+        self._score = int(score)
+        self._last_score = int(last_score)
 
     @property
     def score(self):

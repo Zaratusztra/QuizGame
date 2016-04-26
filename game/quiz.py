@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #By Ziemowit "Zaratustra" Wójcicki
 
-from .interface import Ui
+
 from .users import User
 
 
@@ -122,10 +122,4 @@ class Riddle:
     def is_correct_answer(self, ans):
         return self._correct_answer == str(ans)
 
-
-class QuizException(Exception):
-    pass
-
-class QuizDataError(QuizException):
-    pass
 
