@@ -33,7 +33,7 @@ class Ui:
             self._clear_screen()
 
     def ask(self, arg):
-        res = self.input(arg+'\n[y/N]')
+        res = self.input('\n  '+arg+'\n    [y/N]\n')
         if res.lower() == 'y':
             return True
         else:
@@ -42,7 +42,7 @@ class Ui:
     def input(self, arg='', clear_before=False):
         if clear_before:
             self._clear_screen()
-            arg = '\n\n     '+str(arg)
+            arg = '\n\n'+str(arg)
         return input(arg)
         self._clear_screen()
 
