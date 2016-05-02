@@ -67,24 +67,19 @@ def load_user(dbname, login='guest', password=''):
         cursor.close()
     return user
 
+def execute_sql_query(connection, query, values):
+    cursor = connection.cursor()
+    cursor.execute(query, values)
+    connection.commit()
+
 
 def update_user(dbname, current_login, user_new):
 
     login = user_new.login
     score = user_new.score
+    query_update = 'UPDATE Users SET login=?, score=? WHERE login=?'
 
-    query_update_score = 'UPDATE Users SET login=?, score=? WHERE login=?'
-    print('executing: ', query_update_score, file=sys.stderr)
-    input()
-
-    try:
-        connection = sqlite3.connect(dbname)
-        cursor = connection.cursor()
-        
-        cursor.execute(query_update_score, (login, score, current_login))
-        connection.commit()
-
-        connection.close()
-    except Exception:
-        pass
+    connection = sqlite3.connect(dbname)
+    execute_sql_query(connection, query_update, (login, score, current_login))
+    connection.close()
 

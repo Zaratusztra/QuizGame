@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# interface.py
 # By Ziemowit "Zaratustra" Wójcicki
 
 import os

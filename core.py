@@ -25,39 +25,30 @@ class Application:
 
 
     def setup_actions(self):
-        self.possible_options = [
-                                '[S]tart new game',
-                                'Load quiz from [F]ile',
-                                '[V]iew last score',
-                                '[C]hange login or password',
-                                '[L]ogin',
-                                '[Q]uit',
-                                ]
+        self.possible_options = {
+            's' : {'msg': '[S]tart new game', 'action': self.start_new_game},
+            'f' : {'msg': 'Load quiz from [F]ile', 'action': self.load_quiz_from_file},
+            'v' : {'msg': '[V]iew last score', 'action': self.view_last_user_score},
+            'c' : {'msg': '[C]hange login or password', 'action': self.change_login_or_passwd},
+            'l' : {'msg': '[L]ogin', 'action': self.login_user},
+            'q' : {'msg': '[Q]uit', 'action': self.quit},
+        }
+ 
 
 
     def process_command(self, command):
-        if command == 's':
-            self.start_new_game()
-        elif command == 'v':
-            self.view_last_user_score()
-        elif command == 'l':
-            self.login_user()
-        elif command == '':
-            self.change_login_or_passwd()
-        elif command == 'f':
-            self.load_quiz_from_file()
-        elif command == 'q':
-            self.ui.quit()
+        try:
+            self.possible_options[command]['action']()
+        except KeyError as err:
+            pass
 
 
     def main_loop(self):
         self.login_user()
         
-        msg = "\nYou're login as {}\n".format(self.current_user)
-        msg += format_list(self.possible_options)+'\n'
-        
         command = "none"
         while command not in ('q', 'quit'):
+            msg = self._get_main_menu_str()
             self.ui.output( msg, block=False )
             command = self.ui.input('>').lower()
             self.process_command(command)
@@ -70,11 +61,7 @@ class Application:
             self.ui.output('No quiz is loaded...',)
             return
         
-        for question in self.quiz:
-            quest = '   '+str(question)
-            user_answer = self.ui.input(quest, clear_before=True)
-            reply = question.get_answer(user_answer)
-            self.ui.output(reply)
+        self._redeem_quiz()
         
         final_message = \
         "You earned {} for this quiz.\nDo you want to save your score?" \
@@ -127,10 +114,8 @@ class Application:
     def save_user_score(self):
         login = self.current_user.login
         self.current_user.score = self.quiz.current_score
-        data_storage.update_user(   self.database_name, 
-                                    login, 
-                                    self.current_user
-                                )
+        self._update_user()
+        
 
 
     def change_login_or_passwd(self):
@@ -141,25 +126,46 @@ class Application:
             self._change_password()
 
 
+    def quit(self):
+        pass
+
+    
+    def _get_main_menu_str(self):
+        msg = "\nYou're login as {}\n".format(self.current_user)
+        l = [option['msg'] for option in self.possible_options.values()]
+        msg += format_list(l)+'\n'
+        return msg
+
+
+    def _redeem_quiz(self):
+        for question in self.quiz:
+            quest = '   '+str(question)
+            user_answer = self.ui.input(quest, clear_before=True)
+            reply = question.get_answer(user_answer)
+            self.ui.output(reply)
+
+
     def _change_login(self):
-        login = self.current_user.login
+        prev_login = self.current_user.login
         self.current_user.login = \
         self.ui.input('  new password:', clear_before=True)
-        data_storage.update_user(self.database_name,
-                                 login,
-                                 self.current_user
-                                )
+        sefl._update_user(prev_login)
 
 
     def _change_password(self):
-        login = self.current_user.login
         self.current_user.password = \
         self.ui.input('  new password:', clear_before=True)
-        data_storage.update_user(self.database_name,
-                                 login,
-                                 self.current_user
-                                )
+        self._update_user()
 
+
+    def _update_user(self, previous_login=None):
+        if previous_login == None:       #It is needed only when we're changing user login
+            previous_login = self.current_user.login
+        data_storage.update_user(   
+                                    self.database_name, 
+                                    previous_login, 
+                                    self.current_user
+                                )
    
     def _login_as_guest(self):
         self.current_user = User('guest', 0)       
