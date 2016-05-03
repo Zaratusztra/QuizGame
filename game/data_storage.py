@@ -33,6 +33,10 @@ def load_quiz_from_json(filename):
     new_quiz = Quiz(riddles)
     return new_quiz
 
+def execute_sql_select(connection, query):
+    cursor = connection.cursor()
+    cursor.execute(query)
+    return cursor.fetchone()
 
 def load_user(dbname, login='guest', password=''):
     """
