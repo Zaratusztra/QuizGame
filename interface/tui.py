@@ -4,8 +4,13 @@
 import os
 
 class Ui:
+
+
     def __init__(self):
         pass
+    
+    def __del__(self):
+        self.quit()
 
     def _hline(ch, l):
         s = '\n'
@@ -37,12 +42,24 @@ class Ui:
             return True
         else:
             return False
+    
+    def get_login_data(self):
+        self._clear_screen()
+        login = input('\n\n\n     login:')
+        if login != 'guest' and login != '':
+            passwd = input('     password:')
+        else:
+            passwd = ''
+        return (login, passwd)
 
-    def input(self, arg='', clear_before=False):
+    def get_commandline(self, arg=''):
+        return self.input(arg, clear_before=False)
+
+    def input(self, arg='', clear_before=True):
         if clear_before:
             self._clear_screen()
-            arg = '\n\n'+str(arg)
-        return input(arg)
+            arg = '    \n\n'+str(arg)
+        return input(str(arg))
         self._clear_screen()
 
     def warning(self, warn):

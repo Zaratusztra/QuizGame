@@ -53,11 +53,9 @@ def load_user(dbname, login='guest', password=''):
         password = str(password)
 
         connection = sqlite3.connect(dbname)
-        cursor = connection.cursor()
-        cursor.execute(query_select_user)
-        user_data = cursor.fetchone()
+        user_data = execute_sql_select(connection, query_select_user)
         if user_data is None:
-            return None
+            return user_data
 
         if password == user_data[1]:     # user_data = (login, score, password)
             user = User(login, user_data[0])
@@ -66,9 +64,9 @@ def load_user(dbname, login='guest', password=''):
     except ValueError:
         return None
     except Exception:
-        return None
-    else:
-        cursor.close()
+        pass
+    finally:
+        connection.close()
     return user
 
 def execute_sql_query(connection, query, values):

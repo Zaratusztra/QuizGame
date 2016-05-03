@@ -50,7 +50,7 @@ class Application:
         while command not in ('q', 'quit'):
             msg = self._get_main_menu_str()
             self.ui.output( msg, block=False )
-            command = self.ui.input('>').lower()
+            command = self.ui.get_commandline('>').lower()
             self.process_command(command)
 
 
@@ -72,13 +72,26 @@ class Application:
             self.save_user_score()
 
 
+    #def login_user(self):
+    #    new_login = self.ui.input("login:")
+    #    if new_login == 'guest' or new_login == '':
+    #        self._login_as_guest()
+    #    else:
+    #        passwd = self.ui.input("password:")
+    #        new_user = data_storage.load_user(self.database_name, new_login, passwd)
+    #        if new_user is not None:
+    #            self.current_user = new_user
+    #        else:
+    #            self.ui.warning("Login failed!")
+    #            if self.current_user is None:
+    #                self._login_as_guest()
     def login_user(self):
-        new_login = self.ui.input("    login:", clear_before=True)
-        if new_login == 'guest' or new_login == '':
+        new_login, passwd = self.ui.get_login_data()
+        if new_login == 'quest' or new_login == '':
             self._login_as_guest()
         else:
-            passwd = self.ui.input("    password:", clear_before=False)
-            new_user = data_storage.load_user(self.database_name, new_login, passwd)
+            new_user = data_storage. \
+            load_user(self.database_name, new_login, passwd)
             if new_user is not None:
                 self.current_user = new_user
             else:
@@ -94,7 +107,7 @@ class Application:
 
 
     def load_quiz_from_file(self):
-        fname = self.ui.input('    file-name:', clear_before=True)
+        fname = self.ui.input('file-name:')
         try:
             q = data_storage.load_quiz_from_json(fname)
             self.quiz = q
@@ -119,7 +132,7 @@ class Application:
 
 
     def change_login_or_passwd(self):
-        option = self.ui.input("   [L]ogin or [P]assword?", clear_before=True)
+        option = self.ui.input("[L]ogin or [P]assword?")
         if option == 'l' or option == 'L':
             self._change_login()
         elif option == 'p' or option == 'P':
@@ -139,8 +152,8 @@ class Application:
 
     def _redeem_quiz(self):
         for question in self.quiz:
-            quest = '   '+str(question)
-            user_answer = self.ui.input(quest, clear_before=True)
+            quest = str(question)
+            user_answer = self.ui.input(quest)
             reply = question.get_answer(user_answer)
             self.ui.output(reply)
 
@@ -148,13 +161,13 @@ class Application:
     def _change_login(self):
         prev_login = self.current_user.login
         self.current_user.login = \
-        self.ui.input('  new password:', clear_before=True)
+        self.ui.input('new login:')
         sefl._update_user(prev_login)
 
 
     def _change_password(self):
         self.current_user.password = \
-        self.ui.input('  new password:', clear_before=True)
+        self.ui.input('new password:')
         self._update_user()
 
 
