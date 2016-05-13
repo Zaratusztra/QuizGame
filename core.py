@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # By Ziemowit "Zaratustra" Wójcicki
 
+import os
+import sys
+import logging
 
 from game.users import User
 from game.quiz import Quiz
@@ -16,12 +19,16 @@ class Application:
     """
 
     def __init__(self, new_quiz=None):
-        self.database_name = 'locals.db'
+        dbname = 'locals.db' if os.path.isfile('locals.db') \
+                             else 'QuizGame/locals.db'
+        self.database_name = dbname
 
         self.quiz = new_quiz
         self.current_user = User('guest', 0)
         self.ui = Ui()
         self.setup_actions()
+
+        self._logger_config()
 
 
     def setup_actions(self):
@@ -96,6 +103,7 @@ class Application:
                 self.current_user = new_user
             else:
                 self.ui.warning("Login failed!")
+                logging.warning("Failed attempt to log-in: {}".format(new_login))
                 if self.current_user is None:
                     self._login_as_guest()
 
@@ -111,10 +119,13 @@ class Application:
         try:
             q = data_storage.load_quiz_from_json(fname)
             self.quiz = q
+
         except (FileNotFoundError, OSError) as ex:
             self.ui.warning("Error - file not found.")
+            logging.debug(ex)
         except Exception as ex:
-            self.ui.warning("Error while processing file... {}".format(ex))
+            self.ui.warning(ex)
+            logging.debug('Unexpected error while processing file - ', ex)
         else:
             self.ui.output("Quiz successfully loaded.")
 
@@ -183,4 +194,7 @@ class Application:
     def _login_as_guest(self):
         self.current_user = User('guest', 0)       
     
-
+    def _logger_config(self):
+        dblevel = logging.DEBUG if ('--debug' in sys.argv) else logging.INFO
+        dbfile = 'debug.log' if ('--debug' in sys.argv) else 'last_session.log'
+        logging.basicConfig(filename=dbfile,  level=dblevel)

@@ -2,6 +2,7 @@
 # By Ziemowit "Zaratustra" Wójcicki
 
 import os
+import getpass
 
 class Ui:
 
@@ -45,9 +46,10 @@ class Ui:
     
     def get_login_data(self):
         self._clear_screen()
-        login = input('\n\n\n     login:')
+        login = input('\n\n\nlogin:')
         if login != 'guest' and login != '':
-            passwd = input('     password:')
+            #passwd = input('password:')
+            passwd = getpass.getpass()
         else:
             passwd = ''
         return (login, passwd)

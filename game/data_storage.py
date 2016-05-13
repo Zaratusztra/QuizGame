@@ -61,7 +61,8 @@ def load_user(dbname, login='guest', password=''):
             user = User(login, user_data[0])
         else:
             return None
-    except ValueError:
+    except ValueError as err:
+        logging.debug(err)
         return None
     except Exception:
         pass
