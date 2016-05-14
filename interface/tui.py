@@ -46,10 +46,10 @@ class Ui:
     
     def get_login_data(self):
         self._clear_screen()
-        login = input('\n\n\nlogin:')
+        login = input('\n\n\n      login:')
         if login != 'guest' and login != '':
             #passwd = input('password:')
-            passwd = getpass.getpass()
+            passwd = getpass.getpass(prompt='      password:')
         else:
             passwd = ''
         return (login, passwd)
