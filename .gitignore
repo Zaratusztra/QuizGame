@@ -12,3 +12,6 @@ __pycache__/
 # virtualenv
 venv/
 ENV/
+
+# bash
+*.sh
