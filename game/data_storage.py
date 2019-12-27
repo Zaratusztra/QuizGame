@@ -86,3 +86,8 @@ def update_user(dbname, current_login, user_new):
     execute_sql_query(connection, query_update, (login, score, current_login))
     connection.close()
 
+def add_user(dbname, login, passwd):
+    pass
+
+def delete_user(dbname, login, passwd):
+    pass

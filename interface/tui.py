@@ -13,7 +13,7 @@ class Ui:
     def __del__(self):
         self.quit()
 
-    def _hline(ch, l):
+    def _hline(self, ch, l):
         s = '\n'
         for i in range(l):
             s += ch
@@ -53,12 +53,17 @@ class Ui:
         else:
             return False
     
-    def get_login_data(self):
+    def get_login_data(self, repeat=False):
         self._clear_screen()
         login = input('\n\n\n      login:')
-        if login != 'guest' and login != '':
+        if (login != 'guest' and login != 'Guest') and login != '':
             #passwd = input('password:')
             passwd = getpass.getpass(prompt='      password:')
+            if repeat == True:
+                repeat_msg = '      repeat your password:'
+                repeat_passwd = getpass.getpass(prompt=repeat_msg)
+                if passwd != repeat_passwd:
+                    raise Exception("Passwords are not the same.")
         else:
             passwd = ''
         return (login, passwd)

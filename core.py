@@ -39,7 +39,7 @@ class Application:
             'c' : {'msg': '[C]hange login or password', 'action': self.change_login_or_passwd},
             'l' : {'msg': '[L]ogin', 'action': self.login_user},
             'a' : {'msg': '[A]dd new user', 'action': self.add_new_user},
-            'd' : {'msg': '[D]elete current user', 'action': self.delete_current_user},
+            'd' : {'msg': '[D]elete user', 'action': self.delete_user},
             'q' : {'msg': '[Q]uit', 'action': self.quit},
         }
  
@@ -122,7 +122,6 @@ class Application:
         try:
             q = data_storage.load_quiz_from_json(fname)
             self.quiz = q
-
         except (FileNotFoundError, OSError) as ex:
             self.ui.warning("Error - file not found.")
             logging.debug(ex)
@@ -153,10 +152,18 @@ class Application:
             self._change_password()
     
     def add_new_user(self):
-        pass
+        try:
+            new_login, new_passwd = self.ui.get_login_data(repeat=True)
+            data_storage.add_user(self.database_name, new_login, new_passwd)
+        except Exception as err:
+            self.ui.output("Sorry, {}".format(err))
 
-    def delete_current_user(self):
-        pass
+    def delete_user(self):
+        user_login, user_passwd = self.ui.get_login_data(repeat=True)
+        if self.ui.input("Are you sure, you want to delete user {}?\
+             [Y/n]".format(user_login)) not in ['n','N']:
+            data_storage.delete_user(self.database_name, user_login, user_passwd)
+        
 
 
     def quit(self):
