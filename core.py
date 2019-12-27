@@ -128,7 +128,7 @@ class Application:
             logging.debug(ex)
         except Exception as ex:
             self.ui.warning(ex)
-            logging.debug('Unexpected error while processing file - ', ex)
+            logging.debug('Unexpected error while processing file - {}'.format(ex))
         else:
             self.ui.output("Quiz successfully loaded.")
 
