@@ -38,6 +38,8 @@ class Application:
             'v' : {'msg': '[V]iew last score', 'action': self.view_last_user_score},
             'c' : {'msg': '[C]hange login or password', 'action': self.change_login_or_passwd},
             'l' : {'msg': '[L]ogin', 'action': self.login_user},
+            'a' : {'msg': '[A]dd new user', 'action': self.add_new_user},
+            'd' : {'msg': '[D]elete current user', 'action': self.delete_current_user},
             'q' : {'msg': '[Q]uit', 'action': self.quit},
         }
  
@@ -47,7 +49,8 @@ class Application:
         try:
             self.possible_options[command]['action']()
         except KeyError as err:
-            pass
+            err_msg="Sorry, some kind of error has occured:\n{}".format(err)
+            self.ui.output(err_msg)
 
 
     def main_loop(self):
@@ -131,14 +134,14 @@ class Application:
 
 
     def show_main_menu(self):
-        for option in self.possible_actions:
+        for option in self.possible_options:
             self.ui.output(option)
 
 
     def save_user_score(self):
         login = self.current_user.login
         self.current_user.score = self.quiz.current_score
-        self._update_user()
+        self._update_user(login)
         
 
 
@@ -148,6 +151,12 @@ class Application:
             self._change_login()
         elif option == 'p' or option == 'P':
             self._change_password()
+    
+    def add_new_user(self):
+        pass
+
+    def delete_current_user(self):
+        pass
 
 
     def quit(self):
@@ -173,7 +182,7 @@ class Application:
         prev_login = self.current_user.login
         self.current_user.login = \
         self.ui.input('new login:')
-        sefl._update_user(prev_login)
+        self._update_user(prev_login)
 
 
     def _change_password(self):
