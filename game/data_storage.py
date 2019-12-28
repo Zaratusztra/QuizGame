@@ -109,7 +109,6 @@ def update_user(dbname, current_login, user_new):
     finally:
         connection.close()
 
-
 def add_user(dbname, login, passwd):
     """Adds user with login and password passed as arguments into database. Return False if error has occured during the execution of query.
     param dbname: type str --  name of the database to update
