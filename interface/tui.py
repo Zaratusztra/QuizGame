@@ -80,9 +80,9 @@ class Ui:
 
     def warning(self, warn):
         self._clear_screen()
-        print(Ui._hline('=', len(warn)+27))
+        print(_hline('=', len(warn)+27))
         print("\n       WARNING: {}\n\n".format(warn))
-        print(Ui._hline('=', len(warn)+27))
+        print(_hline('=', len(warn)+27))
         input('\n<press any key>')
         self._clear_screen()
 

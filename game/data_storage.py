@@ -101,9 +101,13 @@ def update_user(dbname, current_login, user_new):
     score = user_new.score
     query_update = 'UPDATE Users SET login={}, score={} WHERE login={}'.format(login, score, current_login)
 
-    connection = sqlite3.connect(dbname)
-    execute_sql_query(connection, query_update)
-    connection.close()
+    try:
+        connection = sqlite3.connect(dbname)
+        execute_sql_query(connection, query_update)
+    except Exception as err:
+        logging.info(err)
+    finally:
+        connection.close()
 
 
 def add_user(dbname, login, passwd):
@@ -118,10 +122,11 @@ def add_user(dbname, login, passwd):
     try:
         connection = sqlite3.connect(dbname)
         execute_sql_query(connection, query_add_user)
-        connection.close()
     except Exception as err:
         logging.debug(err)
         return False
+    finally:
+        connection.close()
     return True
 
 def delete_user(dbname, login, passwd):
@@ -136,8 +141,9 @@ def delete_user(dbname, login, passwd):
     try:
         connection = sqlite3.connect(dbname)
         execute_sql_query(connection, query_delete_user)
-        connection.close()
     except Exception as err:
         logging.debug(err)
         return False
+    finally:
+        connection.close()
     return True
