@@ -14,8 +14,8 @@ from common.stringtools import *
 from game import data_storage
 
 class Application:
-    """
-    Class represent application. It's a "glue" for interface, game engine and data management.
+    """Class represent application. It's a "glue" for interface, game engine and data management. 
+    Application should be started by creating an instance of this class and invoking method "main_loop".
     """
 
     def __init__(self, new_quiz=None):
@@ -33,14 +33,14 @@ class Application:
 
     def setup_actions(self):
         self.possible_options = {
-            's' : {'msg': '[S]tart new game', 'action': self.start_new_game},
-            'f' : {'msg': 'Load quiz from [F]ile', 'action': self.load_quiz_from_file},
-            'v' : {'msg': '[V]iew last score', 'action': self.view_last_user_score},
-            'c' : {'msg': '[C]hange login or password', 'action': self.change_login_or_passwd},
-            'l' : {'msg': '[L]ogin', 'action': self.login_user},
-            'a' : {'msg': '[A]dd new user', 'action': self.add_new_user},
-            'd' : {'msg': '[D]elete user', 'action': self.delete_user},
-            'q' : {'msg': '[Q]uit', 'action': self.quit},
+            's' : {'msg': ' [S]tart new game', 'action': self.start_new_game},
+            'f' : {'msg': ' Load quiz from [F]ile', 'action': self.load_quiz_from_file},
+            'v' : {'msg': ' [V]iew last score', 'action': self.view_last_user_score},
+            'c' : {'msg': ' [C]hange login or password', 'action': self.change_login_or_passwd},
+            'l' : {'msg': ' [L]ogin', 'action': self.login_user},
+            'a' : {'msg': ' [A]dd new user', 'action': self.add_new_user},
+            'd' : {'msg': ' [D]elete user', 'action': self.delete_user},
+            'q' : {'msg': ' [Q]uit', 'action': self.quit},
         }
  
 
@@ -50,17 +50,6 @@ class Application:
         except KeyError as err:
             err_msg="Sorry, some kind of error has occured:\n{}".format(err)
             self.ui.warning(err_msg)
-
-
-    def main_loop(self):
-        self.login_user()
-        
-        command = "none"
-        while command not in ('q', 'quit'):
-            msg = self._get_main_menu_str()
-            self.ui.output( msg, block=False )
-            command = self.ui.get_commandline('>').lower()
-            self.process_command(command)
 
 
     def start_new_game(self):
@@ -149,7 +138,6 @@ class Application:
             data_storage.delete_user(self.database_name, user_login, user_passwd)
         
 
-
     def quit(self):
         pass
 
@@ -198,3 +186,13 @@ class Application:
         dblevel = logging.DEBUG if ('--debug' in sys.argv) else logging.INFO
         dbfile = 'debug.log' if ('--debug' in sys.argv) else 'last_session.log'
         logging.basicConfig(filename=dbfile,  level=dblevel)
+
+    def main_loop(self):
+        self.login_user()
+        
+        command = "none"
+        while command not in ('q', 'quit'):
+            msg = self._get_main_menu_str()
+            self.ui.output( msg, block=False )
+            command = self.ui.get_commandline('>').lower()
+            self.process_command(command)

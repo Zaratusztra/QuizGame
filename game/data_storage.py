@@ -81,9 +81,9 @@ def load_user(dbname, login='guest', password=''):
         else:
             return None
     except ValueError as err:
-        logging.info(err)
+        logging.debug(err)
         return None
-    except Exception as err:
+    except sqlite3.Error as err:
         logging.info(err)
         return None
     finally:    #finally is always executed before leaving try statement. "Returns" here would overwrite all the others. I still need a reminder.
@@ -104,7 +104,7 @@ def update_user(dbname, current_login, user_new):
     try:
         connection = sqlite3.connect(dbname)
         execute_sql_query(connection, query_update, (login, score, current_login))
-    except Exception as err:
+    except sqlite3.Error as err:
         logging.info(err)
     finally:
         connection.close()
@@ -122,7 +122,7 @@ def add_user(dbname, login, passwd):
         connection = sqlite3.connect(dbname)
         breakpoint()
         execute_sql_query(connection, query_add_user, (login, 0, passwd))
-    except Exception as err:
+    except sqlite3.Error as err:
         logging.debug(err)
         return False
     finally:
@@ -141,7 +141,7 @@ def delete_user(dbname, login, passwd):
     try:
         connection = sqlite3.connect(dbname)
         execute_sql_query(connection, query_delete_user, (login, passwd))
-    except Exception as err:
+    except sqlite3.Error as err:
         logging.debug(err)
         return False
     finally:
