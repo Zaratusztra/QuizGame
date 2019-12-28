@@ -38,10 +38,17 @@ def execute_sql_select(connection, query):
     cursor.execute(query)
     return cursor.fetchone()
 
+def execute_sql_query(connection, query, values):
+    cursor = connection.cursor()
+    cursor.execute(query, values)
+    connection.commit()
+
 def load_user(dbname, login='guest', password=''):
     """
     Load user from by "login" in database named in "dbname".
     """
+    # This function needs attention! Is not readable enough.
+    # Checking password should be delegated into another function, used in "delete_user" function.
 
     query_select_user = \
     'SELECT score, password FROM Users where login="{}"'.format(login)
@@ -70,12 +77,6 @@ def load_user(dbname, login='guest', password=''):
         connection.close()
     return user
 
-def execute_sql_query(connection, query, values):
-    cursor = connection.cursor()
-    cursor.execute(query, values)
-    connection.commit()
-
-
 def update_user(dbname, current_login, user_new):
 
     login = user_new.login
@@ -86,8 +87,17 @@ def update_user(dbname, current_login, user_new):
     execute_sql_query(connection, query_update, (login, score, current_login))
     connection.close()
 
+
 def add_user(dbname, login, passwd):
-    pass
+    query_add_user = 'INSERT INTO Users VALUES (?,?)'
+
+    connection = sqlite3.connect(dbname)
+    # execute_sql_insert
+    connection.close()
 
 def delete_user(dbname, login, passwd):
-    pass
+    query_delete_user = 'DELETE FROM Users WHERE login=?'
+
+    connection = sqlite3.connect(dbname)
+    # execute_sql_delete
+    connection.close()

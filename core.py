@@ -81,20 +81,6 @@ class Application:
         if(save):
             self.save_user_score()
 
-
-    #def login_user(self):
-    #    new_login = self.ui.input("login:")
-    #    if new_login == 'guest' or new_login == '':
-    #        self._login_as_guest()
-    #    else:
-    #        passwd = self.ui.input("password:")
-    #        new_user = data_storage.load_user(self.database_name, new_login, passwd)
-    #        if new_user is not None:
-    #            self.current_user = new_user
-    #        else:
-    #            self.ui.warning("Login failed!")
-    #            if self.current_user is None:
-    #                self._login_as_guest()
     def login_user(self):
         new_login, passwd = self.ui.get_login_data()
         if new_login == 'quest' or new_login == '':
@@ -142,7 +128,6 @@ class Application:
         self.current_user.score = self.quiz.current_score
         self._update_user(login)
         
-
 
     def change_login_or_passwd(self):
         option = self.ui.input("[L]ogin or [P]assword?")
