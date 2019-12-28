@@ -44,13 +44,12 @@ class Application:
         }
  
 
-
     def process_command(self, command):
         try:
             self.possible_options[command]['action']()
         except KeyError as err:
             err_msg="Sorry, some kind of error has occured:\n{}".format(err)
-            self.ui.output(err_msg)
+            self.ui.warning(err_msg)
 
 
     def main_loop(self):
@@ -141,7 +140,7 @@ class Application:
             new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
             data_storage.add_user(self.database_name, new_login, new_passwd)
         except Exception as err:
-            self.ui.output("Sorry, {}".format(err))
+            self.ui.warning("Sorry, {}".format(err))
 
     def delete_user(self):
         user_login, user_passwd = self.ui.get_login_data()
