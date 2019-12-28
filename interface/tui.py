@@ -20,22 +20,19 @@ class Ui:
         s += '\n'
         return s
 
-    def _dirty_clear_screen(self):
+    def _neutral_clear_screen(self):
         for i in range(100): print('\n')
 
     def _clear_screen(self):
-        if os.name == 'posix':
-            try:
+        try:
+            if os.name == 'posix':
                 os.system('clear')
-            except Exception as err:
-                self._dirty_clear_screen()
-        elif os.name == 'nt':
-            try:
+            elif os.name == 'nt':
                 os.system('cls')
-            except Exception as err:
-                self._dirty_clear_screen()
-        else:
-            self._dirty_clear_screen()
+            else:
+                self._neutral_clear_screen()
+        except Exception:
+            self._neutral_clear_screen()
 
     def output(self, *args, block = True):
         self._clear_screen()
@@ -74,9 +71,10 @@ class Ui:
     def input(self, arg='', clear_before=True):
         if clear_before:
             self._clear_screen()
-            arg = '    \n\n'+str(arg)
-        return input(str(arg))
+            arg = '\n\n    '+str(arg)
+        user_input = input(str(arg))
         self._clear_screen()
+        return user_input
 
     def warning(self, warn):
         self._clear_screen()

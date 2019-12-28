@@ -42,7 +42,6 @@ class Application:
             'd' : {'msg': ' [D]elete user', 'action': self.delete_user},
             'q' : {'msg': ' [Q]uit', 'action': self.quit},
         }
- 
 
     def process_command(self, command):
         try:
@@ -53,8 +52,6 @@ class Application:
 
 
     def start_new_game(self):
-    
-    
         if self.quiz is None:
             self.ui.output('No quiz is loaded...',)
             return
