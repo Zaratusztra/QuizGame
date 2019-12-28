@@ -14,8 +14,8 @@ from common.stringtools import *
 from game import data_storage
 
 class Application:
-    """
-    Class represent application. It's a "glue" for interface, game engine and data.
+    """Class represent application. It's a "glue" for interface, game engine and data management. 
+    Application should be started by creating an instance of this class and invoking method "main_loop".
     """
 
     def __init__(self, new_quiz=None):
@@ -33,32 +33,23 @@ class Application:
 
     def setup_actions(self):
         self.possible_options = {
-            's' : {'msg': '[S]tart new game', 'action': self.start_new_game},
-            'f' : {'msg': 'Load quiz from [F]ile', 'action': self.load_quiz_from_file},
-            'v' : {'msg': '[V]iew last score', 'action': self.view_last_user_score},
-            'c' : {'msg': '[C]hange login or password', 'action': self.change_login_or_passwd},
-            'l' : {'msg': '[L]ogin', 'action': self.login_user},
-            'q' : {'msg': '[Q]uit', 'action': self.quit},
+            's' : {'msg': ' [S]tart new game', 'action': self.start_new_game},
+            'f' : {'msg': ' Load quiz from [F]ile', 'action': self.load_quiz_from_file},
+            'v' : {'msg': ' [V]iew last score', 'action': self.view_last_user_score},
+            'c' : {'msg': ' [C]hange login or password', 'action': self.change_login_or_passwd},
+            'l' : {'msg': ' [L]ogin', 'action': self.login_user},
+            'a' : {'msg': ' [A]dd new user', 'action': self.add_new_user},
+            'd' : {'msg': ' [D]elete user', 'action': self.delete_user},
+            'q' : {'msg': ' [Q]uit', 'action': self.quit},
         }
  
-
 
     def process_command(self, command):
         try:
             self.possible_options[command]['action']()
         except KeyError as err:
-            pass
-
-
-    def main_loop(self):
-        self.login_user()
-        
-        command = "none"
-        while command not in ('q', 'quit'):
-            msg = self._get_main_menu_str()
-            self.ui.output( msg, block=False )
-            command = self.ui.get_commandline('>').lower()
-            self.process_command(command)
+            err_msg="Sorry, some kind of error has occured:\n{}".format(err)
+            self.ui.warning(err_msg)
 
 
     def start_new_game(self):
@@ -78,20 +69,6 @@ class Application:
         if(save):
             self.save_user_score()
 
-
-    #def login_user(self):
-    #    new_login = self.ui.input("login:")
-    #    if new_login == 'guest' or new_login == '':
-    #        self._login_as_guest()
-    #    else:
-    #        passwd = self.ui.input("password:")
-    #        new_user = data_storage.load_user(self.database_name, new_login, passwd)
-    #        if new_user is not None:
-    #            self.current_user = new_user
-    #        else:
-    #            self.ui.warning("Login failed!")
-    #            if self.current_user is None:
-    #                self._login_as_guest()
     def login_user(self):
         new_login, passwd = self.ui.get_login_data()
         if new_login == 'quest' or new_login == '':
@@ -119,28 +96,26 @@ class Application:
         try:
             q = data_storage.load_quiz_from_json(fname)
             self.quiz = q
-
         except (FileNotFoundError, OSError) as ex:
             self.ui.warning("Error - file not found.")
             logging.debug(ex)
         except Exception as ex:
             self.ui.warning(ex)
-            logging.debug('Unexpected error while processing file - ', ex)
+            logging.debug('Unexpected error while processing file - {}'.format(ex))
         else:
             self.ui.output("Quiz successfully loaded.")
 
 
     def show_main_menu(self):
-        for option in self.possible_actions:
+        for option in self.possible_options:
             self.ui.output(option)
 
 
     def save_user_score(self):
         login = self.current_user.login
         self.current_user.score = self.quiz.current_score
-        self._update_user()
+        self._update_user(login)
         
-
 
     def change_login_or_passwd(self):
         option = self.ui.input("[L]ogin or [P]assword?")
@@ -148,14 +123,27 @@ class Application:
             self._change_login()
         elif option == 'p' or option == 'P':
             self._change_password()
+    
+    def add_new_user(self):
+        new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
+        if data_storage.add_user(self.database_name, new_login, new_passwd) == False:
+            log = "Adding user {} to database failed".format(new_login)
+            logging.info(log)
+            self.ui.warning("Sorry, some kind of error has occured. Operation probably failed.")
 
+    def delete_user(self):
+        user_login, user_passwd = self.ui.get_login_data()
+        if self.ui.input("Are you sure, you want to delete user {}?\
+             [Y/n]".format(user_login)) not in ['n','N']:
+            data_storage.delete_user(self.database_name, user_login, user_passwd)
+        
 
     def quit(self):
         pass
 
     
     def _get_main_menu_str(self):
-        msg = "\nYou're login as {}\n".format(self.current_user)
+        msg = "\nYou're logged as {}\n".format(self.current_user)
         l = [option['msg'] for option in self.possible_options.values()]
         msg += format_list(l)+'\n'
         return msg
@@ -173,7 +161,7 @@ class Application:
         prev_login = self.current_user.login
         self.current_user.login = \
         self.ui.input('new login:')
-        sefl._update_user(prev_login)
+        self._update_user(prev_login)
 
 
     def _change_password(self):
@@ -198,3 +186,13 @@ class Application:
         dblevel = logging.DEBUG if ('--debug' in sys.argv) else logging.INFO
         dbfile = 'debug.log' if ('--debug' in sys.argv) else 'last_session.log'
         logging.basicConfig(filename=dbfile,  level=dblevel)
+
+    def main_loop(self):
+        self.login_user()
+        
+        command = "none"
+        while command not in ('q', 'quit'):
+            msg = self._get_main_menu_str()
+            self.ui.output( msg, block=False )
+            command = self.ui.get_commandline('>').lower()
+            self.process_command(command)
