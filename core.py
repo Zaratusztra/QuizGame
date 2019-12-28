@@ -136,15 +136,11 @@ class Application:
             self._change_password()
     
     def add_new_user(self):
-        try:
-            new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
-            if not data_storage.add_user(self.database_name, new_login, new_passwd):
-                log = "Adding user {} to database failed".format(new_login)
-                logging.info(log)
-                self.ui.warning("Sorry, operation failed.")
-        except Exception as err:
-            self.ui.warning("Sorry, {}".format(err))
-            logging.info(err)
+        new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
+        if data_storage.add_user(self.database_name, new_login, new_passwd) == False:
+            log = "Adding user {} to database failed".format(new_login)
+            logging.info(log)
+            self.ui.warning("Sorry, some kind of error has occured. Operation probably failed.")
 
     def delete_user(self):
         user_login, user_passwd = self.ui.get_login_data()
@@ -159,7 +155,7 @@ class Application:
 
     
     def _get_main_menu_str(self):
-        msg = "\nYou're login as {}\n".format(self.current_user)
+        msg = "\nYou're logged as {}\n".format(self.current_user)
         l = [option['msg'] for option in self.possible_options.values()]
         msg += format_list(l)+'\n'
         return msg

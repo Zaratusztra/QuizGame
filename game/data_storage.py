@@ -43,7 +43,7 @@ def execute_sql_select(connection, query):
     cursor.execute(query)
     return cursor.fetchone()
 
-def execute_sql_query(connection, query):
+def execute_sql_query(connection, query, values):
     """Execute sql query, where values are inserted into correct fields in query.
     param connection: type sqlite3.Connection
     param query: type str
@@ -51,7 +51,7 @@ def execute_sql_query(connection, query):
     return: no value
     """
     cursor = connection.cursor()
-    cursor.execute(query)
+    cursor.execute(query, values)
     connection.commit()
 
 def load_user(dbname, login='guest', password=''):
@@ -99,11 +99,11 @@ def update_user(dbname, current_login, user_new):
 
     login = user_new.login
     score = user_new.score
-    query_update = 'UPDATE Users SET login={}, score={} WHERE login={}'.format(login, score, current_login)
+    query_update = 'UPDATE Users SET login=?, score=? WHERE login=?'
 
     try:
         connection = sqlite3.connect(dbname)
-        execute_sql_query(connection, query_update)
+        execute_sql_query(connection, query_update, (login, score, current_login))
     except Exception as err:
         logging.info(err)
     finally:
@@ -116,11 +116,12 @@ def add_user(dbname, login, passwd):
     param passwd: type str -- NEW user password
     return: boolean
     """
-    query_add_user = 'INSERT INTO Users VALUES ({},0,{})'.format(login, passwd)
+    query_add_user = 'INSERT INTO Users VALUES (?,?,?)'
 
     try:
         connection = sqlite3.connect(dbname)
-        execute_sql_query(connection, query_add_user)
+        breakpoint()
+        execute_sql_query(connection, query_add_user, (login, 0, passwd))
     except Exception as err:
         logging.debug(err)
         return False
@@ -135,11 +136,11 @@ def delete_user(dbname, login, passwd):
     param passwd: type str -- user password
     return: boolean
     """
-    query_delete_user = 'DELETE FROM Users WHERE login={} AND password={}'.format(login, passwd)
+    query_delete_user = 'DELETE FROM Users WHERE login=? AND password=?'
 
     try:
         connection = sqlite3.connect(dbname)
-        execute_sql_query(connection, query_delete_user)
+        execute_sql_query(connection, query_delete_user, (login, passwd))
     except Exception as err:
         logging.debug(err)
         return False
