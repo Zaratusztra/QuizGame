@@ -15,7 +15,7 @@ from game import data_storage
 
 class Application:
     """
-    Class represent application. It's a "glue" for interface, game engine and data.
+    Class represent application. It's a "glue" for interface, game engine and data management.
     """
 
     def __init__(self, new_quiz=None):

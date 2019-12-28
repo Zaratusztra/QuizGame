@@ -66,8 +66,6 @@ def load_user(dbname, login='guest', password=''):
 
     query_select_user = \
     'SELECT score, password FROM Users where login="{}"'.format(login)
-    
-    user = None
 
     try:
         login = str(login)
@@ -79,18 +77,17 @@ def load_user(dbname, login='guest', password=''):
             return user_data
 
         if password == user_data[1]:     # user_data = (login, score, password)
-            user = User(login, user_data[0])
+            return User(login, user_data[0])
         else:
             return None
     except ValueError as err:
-        logging.debug(err)
+        logging.info(err)
         return None
     except Exception as err:
-        logging.debug(err)
+        logging.info(err)
         return None
-    finally:
+    finally:    #finally is always executed before leaving try statement. "Returns" here would overwrite all the others. I still need a reminder.
         connection.close()
-        return user
 
 def update_user(dbname, current_login, user_new):
     """Update user data.
