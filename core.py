@@ -138,13 +138,13 @@ class Application:
     
     def add_new_user(self):
         try:
-            new_login, new_passwd = self.ui.get_login_data(repeat=True)
+            new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
             data_storage.add_user(self.database_name, new_login, new_passwd)
         except Exception as err:
             self.ui.output("Sorry, {}".format(err))
 
     def delete_user(self):
-        user_login, user_passwd = self.ui.get_login_data(repeat=True)
+        user_login, user_passwd = self.ui.get_login_data()
         if self.ui.input("Are you sure, you want to delete user {}?\
              [Y/n]".format(user_login)) not in ['n','N']:
             data_storage.delete_user(self.database_name, user_login, user_passwd)

@@ -13,7 +13,9 @@ from .users import User
 
 def load_quiz_from_json(filename):
     """
-    TO-DO
+    Load and returns quiz as set of tuples question-answers-correct answer.
+    param filename: type str
+    return quiz.Quiz
     """
 
     quiz_dict = json.load(open(filename))
@@ -34,18 +36,28 @@ def load_quiz_from_json(filename):
     return new_quiz
 
 def execute_sql_select(connection, query):
+    """Execute sql query passed as the second argument to the database sqlite3.Connection passed as the first argument."""
     cursor = connection.cursor()
     cursor.execute(query)
     return cursor.fetchone()
 
 def execute_sql_query(connection, query, values):
+    """Execute sql query
+    param connection: type sqlite3.Connection
+    param query: type str
+    param values: type str
+    return: no value
+    """
     cursor = connection.cursor()
     cursor.execute(query, values)
     connection.commit()
 
 def load_user(dbname, login='guest', password=''):
-    """
-    Load user from by "login" in database named in "dbname".
+    """Load user from by "login" in database named in "dbname" and then returns as object user.User.
+    param dbname: type str
+    param login: type str
+    param password: type str
+    return: users.User
     """
     # This function needs attention! Is not readable enough.
     # Checking password should be delegated into another function, used in "delete_user" function.
@@ -78,6 +90,12 @@ def load_user(dbname, login='guest', password=''):
     return user
 
 def update_user(dbname, current_login, user_new):
+    """Update user data.
+    param dbname: type str -- name of the database to update
+    param current_login: type str
+    param user_new: users.User -- new datas used to overwrite current user datas
+    return: no value
+    """
 
     login = user_new.login
     score = user_new.score
@@ -89,13 +107,25 @@ def update_user(dbname, current_login, user_new):
 
 
 def add_user(dbname, login, passwd):
+    """Adds user with login and password passed as arguments into database.
+    param dbname: type str --  name of the database to update
+    param login: type str -- NEW user login
+    param passwd: type str -- NEW user password
+    return: no value
+    """
     query_add_user = 'INSERT INTO Users VALUES (?,?)'
 
     connection = sqlite3.connect(dbname)
-    # execute_sql_insert
+    # execute_sql_query(connection, query_add_user, login, 0, passwd)
     connection.close()
 
 def delete_user(dbname, login, passwd):
+    """Delete user by login AND password(!) from database.
+    param dbname: type str --  name of the database to update
+    param login: type str -- user login
+    param passwd: type str -- user password
+    return: no value
+    """
     query_delete_user = 'DELETE FROM Users WHERE login=?'
 
     connection = sqlite3.connect(dbname)
