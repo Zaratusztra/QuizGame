@@ -5,7 +5,7 @@ import os
 import getpass
 
 class Ui:
-
+    """Class Ui provides methods for terminal input-output."""
 
     def __init__(self):
         pass
@@ -13,35 +13,38 @@ class Ui:
     def __del__(self):
         self.quit()
 
-    def _hline(self, ch, l):
+    def __hline(self, ch, l):
         s = '\n'
         for i in range(l):
             s += ch
         s += '\n'
         return s
 
-    def _neutral_clear_screen(self):
+    def __dirty__clear_screen(self):
         for i in range(100): print('\n')
 
-    def _clear_screen(self):
-        try:
-            if os.name == 'posix':
+    def __clear_screen(self):
+        if os.name == 'posix':
+            try:
                 os.system('clear')
-            elif os.name == 'nt':
+            except Exception as err:
+                self.__dirty__clear_screen()
+        elif os.name == 'nt':
+            try:
                 os.system('cls')
-            else:
-                self._neutral_clear_screen()
-        except Exception:
-            self._neutral_clear_screen()
+            except Exception as err:
+                self.__dirty__clear_screen()
+        else:
+            self.__dirty__clear_screen()
 
     def output(self, *args, block = True):
-        self._clear_screen()
+        self.__clear_screen()
         print('\n')
         for i in args:
             print('    ', i)
         if block: 
             input("\n\nPress any key...")
-            self._clear_screen()
+            self.__clear_screen()
 
     def ask(self, arg):
         res = self.input('\n  '+arg+'\n    [y/N]\n')
@@ -51,7 +54,7 @@ class Ui:
             return False
     
     def get_login_data(self, repeat_password=False):
-        self._clear_screen()
+        self.__clear_screen()
         login = input('\n\n\n      login:')
         if (login != 'guest' and login != 'Guest') and login != '':
             #passwd = input('password:')
@@ -70,21 +73,19 @@ class Ui:
 
     def input(self, arg='', clear_before=True):
         if clear_before:
-            self._clear_screen()
-            arg = '\n\n    '+str(arg)
-        user_input = input(str(arg))
-        self._clear_screen()
-        return user_input
+            self.__clear_screen()
+            arg = '    \n\n'+str(arg)
+        return input(str(arg))
+        self.__clear_screen()
 
     def warning(self, warn):
-        self._clear_screen()
-        print(self._hline('=', len(warn)+27))
+        self.__clear_screen()
+        print(self.__hline('=', len(warn)+27))
         print("\n       WARNING: {}\n\n".format(warn))
-        print(self._hline('=', len(warn)+27))
+        print(self.__hline('=', len(warn)+27))
         input('\n<press any key>')
-        self._clear_screen()
+        self.__clear_screen()
 
     def quit(self):
-        self._clear_screen()
+        self.__clear_screen()
         print('Finishing... have a nice day')
-
