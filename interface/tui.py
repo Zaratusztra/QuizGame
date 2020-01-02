@@ -32,7 +32,7 @@ class Ui:
         elif os.name == 'nt':
             try:
                 os.system('cls')
-            except Exception as err:
+            except Exception:
                 self.__dirty__clear_screen()
         else:
             self.__dirty__clear_screen()
