@@ -94,7 +94,7 @@ class Application:
     def __change_password(self):
         self.current_user.password = \
         self.ui.input('new password:')
-        self._u_pdate_user()
+        self.__update_user()
 
 
     def __update_user(self, previous_login=None):
