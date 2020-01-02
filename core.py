@@ -4,6 +4,7 @@
 import os
 import sys
 import logging
+import configparser
 
 from game.users import User
 from game.quiz import Quiz
@@ -14,22 +15,59 @@ from common.stringtools import *
 from game import data_storage
 
 class Application:
-    """Class represent application. It's a "glue" for interface, game engine and data management. 
+    """Class represent main application logic. It's a "glue" for interface, game engine and data management. 
     Application should be started by creating an instance of this class and invoking method "main_loop".
     """
 
     def __init__(self, new_quiz=None):
-        dbname = 'locals.db' if os.path.isfile('locals.db') \
-                             else 'QuizGame/locals.db'
-        self.database_name = dbname
+        
+        self.__configure()
 
         self.quiz = new_quiz
         self.current_user = User('guest', 0)
         self.ui = Ui()
+
         self.setup_actions()
 
-        self._logger_config()
+    def __configure(self):
+        # self.__config will be used in all __XXX_config() procedures.
+        self.__config = configparser.ConfigParser()
+        
+        self.__database_config()
+        self.__logger_config()
 
+    def __database_config(self):
+        dbname = str()
+        try:
+            self.__config.read('config.ini')
+            dbname = self.__config['DATABASE']['name']
+        except Exception:
+            dbname = 'local.db'
+        if os.path.isfile(dbname):
+            self.database_name = dbname
+        else:
+            dbname = 'QuizGame/{}'.format(dbname)
+            if os.path.isfile(dbname):
+                self.database_name = dbname
+            else:
+                self.database_name = None
+
+    def __logger_config(self):
+        logging_level = str()
+        log_file = str()
+        mode = 'a'
+        if '--debug' in sys.argv:
+            logging_level = logging.DEBUG
+            log_file = 'debug.log'
+        else:
+            try: #TO-DO: Problem is, when only one of parameter will be undefined, the all configuration from file fails.
+                logging_level = self.__config['LOGGER']['level']
+                log_file = self.__config['LOGGER']['file']
+                mode = 'w' if self.__config['LOGGER']['file'] == 'false' else 'a'
+            except Exception:
+                logging_level = logging.INFO
+                log_file = 'last_session.log'
+        logging.basicConfig(filename=log_file, level=logging_level, filemode=mode)
 
     def setup_actions(self):
         self.possible_options = {
@@ -59,7 +97,7 @@ class Application:
             self.ui.output('No quiz is loaded...',)
             return
         
-        self._redeem_quiz()
+        self.__redeem_quiz()
         
         final_message = \
         "You earned {} for this quiz.\nDo you want to save your score?" \
@@ -70,9 +108,13 @@ class Application:
             self.save_user_score()
 
     def login_user(self):
+        if self.database_name == None:
+            logging.info("Database was not found. Trying to log user as guest.")
+            self.ui.warning("Database was not found. You will be logged as guest.")
+            self.__login_as_guest()
         new_login, passwd = self.ui.get_login_data()
-        if new_login == 'quest' or new_login == '':
-            self._login_as_guest()
+        if new_login == 'guest' or new_login == '':
+            self.__login_as_guest()
         else:
             new_user = data_storage. \
             load_user(self.database_name, new_login, passwd)
@@ -82,7 +124,7 @@ class Application:
                 self.ui.warning("Login failed!")
                 logging.warning("Failed attempt to log-in: {}".format(new_login))
                 if self.current_user is None:
-                    self._login_as_guest()
+                    self.__login_as_guest()
 
     def view_last_user_score(self):
         score = self.current_user.score
@@ -114,15 +156,15 @@ class Application:
     def save_user_score(self):
         login = self.current_user.login
         self.current_user.score = self.quiz.current_score
-        self._update_user(login)
+        self.__update_user(login)
         
 
     def change_login_or_passwd(self):
         option = self.ui.input("[L]ogin or [P]assword?")
         if option == 'l' or option == 'L':
-            self._change_login()
+            self.__change_login()
         elif option == 'p' or option == 'P':
-            self._change_password()
+            self.__change_password()
     
     def add_new_user(self):
         new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
@@ -142,14 +184,14 @@ class Application:
         pass
 
     
-    def _get_main_menu_str(self):
+    def __get_main_menu_str(self):
         msg = "\nYou're logged as {}\n".format(self.current_user)
         l = [option['msg'] for option in self.possible_options.values()]
         msg += format_list(l)+'\n'
         return msg
 
 
-    def _redeem_quiz(self):
+    def __redeem_quiz(self):
         for question in self.quiz:
             quest = str(question)
             user_answer = self.ui.input(quest)
@@ -157,20 +199,20 @@ class Application:
             self.ui.output(reply)
 
 
-    def _change_login(self):
+    def __change_login(self):
         prev_login = self.current_user.login
         self.current_user.login = \
         self.ui.input('new login:')
-        self._update_user(prev_login)
+        self.__update_user(prev_login)
 
 
-    def _change_password(self):
+    def __change_password(self):
         self.current_user.password = \
         self.ui.input('new password:')
-        self._update_user()
+        self._u_pdate_user()
 
 
-    def _update_user(self, previous_login=None):
+    def __update_user(self, previous_login=None):
         if previous_login == None:       #It is needed only when we're changing user login
             previous_login = self.current_user.login
         data_storage.update_user(   
@@ -179,20 +221,15 @@ class Application:
                                     self.current_user
                                 )
    
-    def _login_as_guest(self):
+    def __login_as_guest(self):
         self.current_user = User('guest', 0)       
-    
-    def _logger_config(self):
-        dblevel = logging.DEBUG if ('--debug' in sys.argv) else logging.INFO
-        dbfile = 'debug.log' if ('--debug' in sys.argv) else 'last_session.log'
-        logging.basicConfig(filename=dbfile,  level=dblevel)
 
     def main_loop(self):
         self.login_user()
         
         command = "none"
         while command not in ('q', 'quit'):
-            msg = self._get_main_menu_str()
+            msg = self.__get_main_menu_str()
             self.ui.output( msg, block=False )
             command = self.ui.get_commandline('>').lower()
             self.process_command(command)
