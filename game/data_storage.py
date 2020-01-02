@@ -120,7 +120,6 @@ def add_user(dbname, login, passwd):
 
     try:
         connection = sqlite3.connect(dbname)
-        breakpoint()
         execute_sql_query(connection, query_add_user, (login, 0, passwd))
     except sqlite3.Error as err:
         logging.debug(err)
