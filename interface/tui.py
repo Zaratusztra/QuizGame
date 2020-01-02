@@ -27,7 +27,7 @@ class Ui:
         if os.name == 'posix':
             try:
                 os.system('clear')
-            except Exception as err:
+            except Exception:
                 self.__dirty__clear_screen()
         elif os.name == 'nt':
             try:
@@ -75,8 +75,9 @@ class Ui:
         if clear_before:
             self.__clear_screen()
             arg = '    \n\n'+str(arg)
-        return input(str(arg))
+        inp = input(str(arg))
         self.__clear_screen()
+        return inp
 
     def warning(self, warn):
         self.__clear_screen()
