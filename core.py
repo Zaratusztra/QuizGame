@@ -137,10 +137,10 @@ class Application:
     def show_users_list(self):
         users_list = [User(l[0],l[1]) for l \
             in data_storage.load_users_list(self.database_name)]
-        sorted(users_list, key=lambda user: user.score)
+        users_list = sorted(users_list, key=lambda user: user.score, reverse=True)
         message = "Current users:\n"
         for user in users_list:
-            message += "User:" + user.login + " - score: " + str(user.score) + "\n"
+            message += "User: " + user.login + " - score: " + str(user.score) + "\n"
         self.ui.output(message)
 
     def load_quiz_from_file(self):
