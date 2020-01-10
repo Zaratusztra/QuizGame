@@ -137,7 +137,8 @@ class Application:
     def show_users_list(self):
         users_list = [User(l[0],l[1]) for l \
             in data_storage.load_users_list(self.database_name)]
-        message = str()
+        sorted(users_list, key=lambda user: user.score)
+        message = "Current users:\n"
         for user in users_list:
             message += "User:" + user.login + " - score: " + str(user.score) + "\n"
         self.ui.output(message)
@@ -177,10 +178,13 @@ class Application:
     
     def add_new_user(self):
         new_login, new_passwd = self.ui.get_login_data(repeat_password=True)
-        if data_storage.add_user(self.database_name, new_login, new_passwd) == False:
-            log = "Adding user {} to database failed".format(new_login)
-            logging.info(log)
-            self.ui.warning("Sorry, some kind of error has occured. Operation probably failed.")
+        if new_passwd == None:
+            self.ui.warning("Provided passwords are not the same!")
+        else:
+            if data_storage.add_user(self.database_name, new_login, new_passwd) == False:
+                log = "Adding user {} to database failed".format(new_login)
+                logging.info(log)
+                self.ui.warning("Sorry, some kind of error has occured. Operation probably failed.")
 
     def delete_user(self):
         user_login, user_passwd = self.ui.get_login_data()

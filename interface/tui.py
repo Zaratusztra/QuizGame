@@ -57,13 +57,12 @@ class Ui:
         self.__clear_screen()
         login = input('\n\n\n      login:')
         if (login != 'guest' and login != 'Guest') and login != '':
-            #passwd = input('password:')
             passwd = getpass.getpass(prompt='      password:')
             if repeat_password == True:
                 repeat_msg = '      repeat your password:'
                 repeat_passwd = getpass.getpass(prompt=repeat_msg)
                 if passwd != repeat_passwd:
-                    raise Exception("Passwords are not the same.")
+                    passwd = None
         else:
             passwd = ''
         return (login, passwd)

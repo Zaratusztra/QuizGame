@@ -89,16 +89,14 @@ def load_user(dbname, login='guest', password=''):
     'SELECT score, password FROM Users where login="{}"'.format(login)
 
     try:
-        login = str(login)
-        password = str(password)
-        password = str(hash_password(password))
 
         connection = sqlite3.connect(dbname)
         user_data = execute_sql_select(connection, query_select_user)
+
         if user_data is None:
-            return user_data
-        logging.info("Comparing {} to {}".format(password, user_data[1]))
-        if verify_password(password, user_data[1]):     # user_data = (score, password)
+            return None
+
+        if verify_password(user_data[1],password):     # user_data = (score, password)
             return User(login, user_data[0])
         else:
             return None
