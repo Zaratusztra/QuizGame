@@ -2,13 +2,29 @@
 # -*- coding: utf-8 -*-
 # By Ziemowit "Zaratustra" Wójcicki
 
+import os
 import sys
 import logging
 import json
 import sqlite3
+import hashlib
 
 from .quiz import Quiz, Riddle
 from .users import User
+
+
+def hash_password(password, it=10):
+    password = password.encode("utf-8")
+    try:
+        it = int(it)
+    except ValueError:
+        it = int(10)
+    hash_password = hashlib.pbkdf2_hmac('sha512', password, os.urandom(32), it)
+    return hash_password
+
+def verify_password(stored_password, provided_password):
+    provided_password = hash_password(provided_password)
+    return str(stored_password) == str(provided_password)
 
 
 def load_quiz_from_json(filename):
@@ -54,8 +70,13 @@ def execute_sql_query(connection, query, values):
     cursor.execute(query, values)
     connection.commit()
 
+def load_users_list(dbname):
+    cursor = sqlite3.connect(dbname).cursor()
+    cursor.execute("SELECT login, score FROM Users;")
+    return cursor.fetchall()
+
 def load_user(dbname, login='guest', password=''):
-    """Load user from by "login" in database named in "dbname" and then returns as object user.User.
+    """Load user from by "login" in database named in "dbname" and then returns as object users.User.
     param dbname: type str
     param login: type str
     param password: type str
@@ -70,13 +91,14 @@ def load_user(dbname, login='guest', password=''):
     try:
         login = str(login)
         password = str(password)
+        password = str(hash_password(password))
 
         connection = sqlite3.connect(dbname)
         user_data = execute_sql_select(connection, query_select_user)
         if user_data is None:
             return user_data
 
-        if password == user_data[1]:     # user_data = (login, score, password)
+        if verify_password(password, user_data[1]):     # user_data = (score, password)
             return User(login, user_data[0])
         else:
             return None
@@ -116,6 +138,7 @@ def add_user(dbname, login, passwd):
     param passwd: type str -- NEW user password
     return: boolean
     """
+    passwd = str(hash_password(passwd))
     query_add_user = 'INSERT INTO Users VALUES (?,?,?)'
 
     try:
@@ -136,6 +159,7 @@ def delete_user(dbname, login, passwd):
     return: boolean
     """
     query_delete_user = 'DELETE FROM Users WHERE login=? AND password=?'
+    passwd = str(hash_password(passwd))
 
     try:
         connection = sqlite3.connect(dbname)

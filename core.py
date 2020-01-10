@@ -133,7 +133,14 @@ class Application:
         name = str(self.current_user)
         message = 'Current {} score: {}'.format(name, score)
         self.ui.output(message)
-
+    
+    def show_users_list(self):
+        users_list = [User(l[0],l[1]) for l \
+            in data_storage.load_users_list(self.database_name)]
+        message = str()
+        for user in users_list:
+            message += "User:" + user.login + " - score: " + str(user.score) + "\n"
+        self.ui.output(message)
 
     def load_quiz_from_file(self):
         fname = self.ui.input('file-name:')
@@ -195,6 +202,7 @@ class Application:
             'a' : {'msg': ' [A]dd new user', 'action': self.add_new_user},
             'd' : {'msg': ' [D]elete user', 'action': self.delete_user},
             'q' : {'msg': ' [Q]uit', 'action': self.quit},
+            'r' : {'msg': ' show [R]anking', 'action': self.show_users_list}
         }
  
     def start_new_game(self):
