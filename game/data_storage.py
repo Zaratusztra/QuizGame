@@ -13,13 +13,13 @@ from .quiz import Quiz, Riddle
 from .users import User
 
 
-def hash_password(password, it=10):
+def hash_password(password, it=100000):
     password = password.encode("utf-8")
     try:
         it = int(it)
     except ValueError:
         it = int(10)
-    hash_password = hashlib.pbkdf2_hmac('sha512', password, os.urandom(32), it)
+    hash_password = hashlib.pbkdf2_hmac('sha256', password, b'salt', it) #placeholder
     return hash_password
 
 def verify_password(stored_password, provided_password):
@@ -97,7 +97,7 @@ def load_user(dbname, login='guest', password=''):
         user_data = execute_sql_select(connection, query_select_user)
         if user_data is None:
             return user_data
-
+        logging.info("Comparing {} to {}".format(password, user_data[1]))
         if verify_password(password, user_data[1]):     # user_data = (score, password)
             return User(login, user_data[0])
         else:
