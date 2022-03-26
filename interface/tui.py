@@ -4,12 +4,13 @@
 import os
 import getpass
 
+
 class Ui:
     """Class Ui provides methods for terminal input-output."""
 
     def __init__(self):
         pass
-    
+
     def __del__(self):
         self.quit()
 
@@ -21,7 +22,8 @@ class Ui:
         return s
 
     def __dirty__clear_screen(self):
-        for i in range(100): print('\n')
+        for i in range(100):
+            print('\n')
 
     def __clear_screen(self):
         if os.name == 'posix':
@@ -37,12 +39,12 @@ class Ui:
         else:
             self.__dirty__clear_screen()
 
-    def output(self, *args, block = True):
+    def output(self, *args, block=True):
         self.__clear_screen()
         print('\n')
         for i in args:
             print('    ', i)
-        if block: 
+        if block:
             input("\n\nPress any key...")
             self.__clear_screen()
 
@@ -52,13 +54,13 @@ class Ui:
             return True
         else:
             return False
-    
+
     def get_login_data(self, repeat_password=False):
         self.__clear_screen()
         login = input('\n\n\n      login:')
         if (login != 'guest' and login != 'Guest') and login != '':
             passwd = getpass.getpass(prompt='      password:')
-            if repeat_password == True:
+            if repeat_password is True:
                 repeat_msg = '      repeat your password:'
                 repeat_passwd = getpass.getpass(prompt=repeat_msg)
                 if passwd != repeat_passwd:
